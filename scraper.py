@@ -28,6 +28,9 @@ json_rgx = regex.compile(r'''
 (?&json)
 ''', regex.VERBOSE | regex.MULTILINE)
 
+class TradingviewBase:
+    sectors = ['cfd','america','iceland','japan','luxembourg','uk','russia','australia', 'argentina', 'bahrain', 'belgium', 'brazil', 'vietnam', 'germany', 'hongkong', 'denmark', 'egypt', 'israel', 'india', 'indonesia', 'iceland', 'spain', 'italy', 'canada', 'qatar', 'china', 'colombia', 'latvia', 'lithuania', 'malaysia', 'mexico', 'nigeria', 'netherlands', 'newzealand', 'norway', 'uae', 'peru', 'poland', 'portugal', 'ksa', 'serbia', 'singapore', 'thailand', 'taiwan', 'turkey', 'finland', 'france', 'chile', 'switzerland', 'sweden', 'estonia', 'rsa', 'korea']
+
 class TradingViewWsMessages:
     
     def create_message(self, func_name, param_list):
@@ -237,7 +240,7 @@ class TradingviewWsScraper:
                     return candles
 
 
-class TradingViewRestScraper:
+class TradingViewRestScraper(TradingviewBase):
     def __init__(self) -> None:
         self.headers = {
          #'Origin': 'https://ru.tradingview.com',
