@@ -5,7 +5,7 @@ import os
 here = os.path.abspath(os.path.dirname(__file__))
 
 
-VERSION = '0.0.11'
+VERSION = '0.0.12
 DESCRIPTION = 'Scraping tradingview.com'
 LONG_DESCRIPTION = 'A package that allows to retrieve data from tradingview.'
 

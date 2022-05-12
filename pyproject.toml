@@ -1,8 +1,20 @@
 [tool.poetry]
 name = "tw_scraper"
-version = "0.1.0"
-description = ""
-authors = ["fip"]
+version = "0.0.12"
+packages = [
+    { include = "src" }]
+
+description = "Scraping tradingview.com"
+authors = ["fip <ogremagi9@gmail.com>"]
+keywords=['python', 'scraping', 'market data', 'tradingview']
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/ogremagi4/tvw_scraper"
+repository = "https://github.com/ogremagi4/tvw_scraper"
+include = [
+    "LICENSE",
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -20,3 +32,4 @@ uplink = "^0.9.7"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
