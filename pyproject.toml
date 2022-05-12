@@ -1,9 +1,6 @@
 [tool.poetry]
-name = "tw_scraper"
-version = "0.0.12"
-packages = [
-    { include = "src" }]
-
+name = "tvw_scraper"
+version = "0.0.13"
 description = "Scraping tradingview.com"
 authors = ["fip <ogremagi9@gmail.com>"]
 keywords=['python', 'scraping', 'market data', 'tradingview']
