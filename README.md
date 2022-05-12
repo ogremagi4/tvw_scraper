@@ -6,6 +6,7 @@ Usage example:
 retrieve symbols to use them later in websocket queries
 ```python
 from tvw_scraper.rest import SymbolScanner
+from tvw_scraper.models import Sectors
 
 SymbolScanner.get_sector_symbols(Sectors.russia)
 {'totalCount': 937, 'data': [{'s': 'MOEX:AFKS', 'd': []}, {'s': 'MOEX:JNJ-RM', 'd': []} . . .
@@ -15,7 +16,7 @@ retrieve candles and some info from tradingview websocket:
 ```python
 import asyncio
 from tvw_scraper.scraper import TradingviewWsScraper
-from tvw_scraper.models import Intervals, Sectors
+from tvw_scraper.models import Intervals
 
 async def main():
     result = await asyncio.gather(*[
