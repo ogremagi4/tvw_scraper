@@ -5,20 +5,20 @@ import os
 here = os.path.abspath(os.path.dirname(__file__))
 
 
-VERSION = '0.0.1'
+VERSION = '0.0.11'
 DESCRIPTION = 'Scraping tradingview.com'
 LONG_DESCRIPTION = 'A package that allows to retrieve data from tradingview.'
 
-# Setting up
 setup(
-    name="vidstream",
+    name="tvw_scraper",
     version=VERSION,
     author="fip (Filipp Pozdniakov)",
     author_email="<ogremagi9@gmail.com>",
     description=DESCRIPTION,
     long_description_content_type="text/markdown",
     long_description=LONG_DESCRIPTION,
-    setup_requireds=['wheel'],
+    setup_requires=['wheel'],
+    url = 'https://github.com/ogremagi4/tvw_scraper',
     install_requires = [],
     packages=find_packages(),
     keywords=['python', 'scraping', 'market data', 'tradingview'],
