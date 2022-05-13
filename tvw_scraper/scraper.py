@@ -152,8 +152,10 @@ class TradingviewWsScraper(TradingviewBase):
                 response = await connection.recv()
                 for item in self.message_handler(response):
                     try:
-                        obj = factory.load(item, QuoteSeriesData)
-                        return obj.symbol_info
+                        while not 'main_data' in locals():
+                            main_data = factory.load(item, MainData)
+                        additional_data = factory.load(item, AdditionalData)
+                        return CombinedSymbolInfo(main_data.main_info, additional_data.additional_info)
                     except (TypeError, ValueError):
                         await asyncio.sleep(0)
                         continue#XXX play with exceptions a bit

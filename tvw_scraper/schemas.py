@@ -120,9 +120,28 @@ series_completed_schema = Schema(
     }
 )
 
-####
 @dataclass
-class SymbolInfo:#TODO more fields
+class MainInfo:
+    country_code: str
+    nsin: str
+    isin: str
+    sedol: str
+    currency_code: str
+    currency_id: str
+    local_code: str
+    sedol: str
+    short_name: str
+    listed_exchange: str
+    logoid: str
+    timezone: str
+    type: str
+    pro_name: str
+    session_holidays: str
+
+
+
+@dataclass
+class AdditionalInfo:#TODO more fields
     country: str
     country_fund: str
     exchange_traded: str
@@ -145,26 +164,47 @@ class SymbolInfo:#TODO more fields
     exchange_listed_symbol: str
     currency_id: str
 
-symbol_info_schema = Schema(
+additional_info_schema = Schema(
     name_mapping = {underscore(k):k for k in ['exchange-traded','local-description','symbol-proname','rt-update-time','exchange-ticker','exchange-listed','exchange-listed-symbol','short-description','currency-id']}
 )
 
-@dataclass
-class QuoteSeriesData:
+@dataclass 
+class MainData:
     message: Literal['qsd']
     quote_session: str
     symbol_name: str
-    symbol_info: SymbolInfo
+    main_info: MainInfo
 
-quote_series_data_schema  = Schema(
+main_data_schema  = Schema(
     name_mapping = {
         'message':'m',
         'quote_session':('p',0),
         'symbol_name':('p',1,'n'),
-        'symbol_info':('p',1,'v')
+        'main_info':('p',1,'v')
     }
 )
-    
+
+@dataclass
+class AdditionalData:
+    message: Literal['qsd']
+    quote_session: str
+    symbol_name: str
+    additional_info: AdditionalInfo
+
+additional_data_schema  = Schema(
+    name_mapping = {
+        'message':'m',
+        'quote_session':('p',0),
+        'symbol_name':('p',1,'n'),
+        'additional_info':('p',1,'v')
+    }
+)
+
+@dataclass
+class CombinedSymbolInfo:
+    main_info: MainInfo
+    additional_info: AdditionalInfo
+
 
 factory = dataclass_factory.Factory(schemas={
     InitialResponse:initial_response_schema,
@@ -175,6 +215,7 @@ factory = dataclass_factory.Factory(schemas={
     SeriesCompletedMessage: series_completed_schema,
     SymbolDataSeries: symbol_data_series_schema,
     Ohlcv: ohlcv_schema,
-    QuoteSeriesData: quote_series_data_schema,
-    SymbolInfo:symbol_info_schema
+    MainData:main_data_schema,
+    AdditionalData: additional_data_schema,
+    AdditionalInfo:additional_info_schema
     })
