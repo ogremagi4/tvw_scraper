@@ -18,6 +18,8 @@ import asyncio
 from tvw_scraper.scraper import TradingviewWsScraper
 from tvw_scraper.models import Intervals
 
+scraper = TradingviewWsScraper()
+
 async def main():
     result = await asyncio.gather(*[
         scraper.get_candles('NASDAQ:NVDA',Intervals.interval_1day), 
