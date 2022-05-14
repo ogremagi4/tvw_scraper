@@ -4,7 +4,7 @@ import regex
 import string
 import random
 import asyncio
-from tenacity import AsyncRetrying, retry, wait_fixed, stop_after_attempt, retry_if_exception_type, stop, wait
+from tenacity import AsyncRetrying, retry, wait_fixed, stop_after_attempt, retry_if_exception_type, stop_after_delay
 from .schemas import *
 
 json_rgx = regex.compile(r'''
@@ -150,9 +150,9 @@ class TradingviewWsScraper(TradingviewBase):
                     self.messages.quote_add_symbols(quote_session_string, tradingview_symbol),
                     self.messages.quote_fast_symbols(quote_session_string, tradingview_symbol)]
 
-        async for attempt in AsyncRetrying(stop = stop_after_attempt(10), wait = wait_fixed(1), retry=retry_if_exception_type(websockets.InvalidStatusCode)):
+        async for attempt in AsyncRetrying(stop = (stop_after_attempt(10)), wait = wait_fixed(1), retry=retry_if_exception_type((websockets.InvalidStatusCode, websockets.ConnectionClosedOK))):
             with attempt:
-                async with websockets.connect(self.websocket_url, extra_headers=self.headers) as connection: #TODO make a generic iterator
+                async with websockets.connect(self.websocket_url, extra_headers=self.headers, close_timeout=5) as connection: #TODO make a generic iterator
                     for message in messages:#
                         await connection.send(message)
                     while True:
@@ -165,6 +165,5 @@ class TradingviewWsScraper(TradingviewBase):
                                     additional_data = factory.load(item, AdditionalData)
                                     return CombinedSymbolInfo(main_data.main_info, additional_data.additional_info)
                             except (TypeError, ValueError) as e:
-                                print(item, e)
                                 await asyncio.sleep(0)
                                 continue#XXX play with exceptions a bit
