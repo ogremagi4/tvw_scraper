@@ -1,4 +1,3 @@
-from dataclasses import InitVar
 from dataclasses import dataclass
 from typing import Literal, List, Tuple, Optional
 from inflection import underscore
@@ -132,37 +131,41 @@ class MainInfo:
     sedol: str
     short_name: str
     listed_exchange: str
-    logoid: str
     timezone: str
     type: str
+    pro_perm: str
     pro_name: str
     session_holidays: str
+    original_name: str
+    subsessions: list
+    is_tradable: bool
+    logoid: Optional[str] = None
 
 
 
 @dataclass
 class AdditionalInfo:#TODO more fields
-    country: str
-    country_fund: str
-    exchange_traded: str
-    industry: str
-    business_description: str
-    local_description: str
-    short_description: str
-    group: str
-    mic: str
-    sector: str
-    web_site_url: str
-    ceo: str
-    location: str
-    dividend_type_recent: str
-    fundamental_currency_code: str
     symbol_proname: str
-    rt_update_time: str
-    exchange_listed: str
-    exchange_ticker: str
-    exchange_listed_symbol: str
-    currency_id: str
+    country: Optional[str] = None
+    country_fund: Optional[str] = None
+    exchange_traded: Optional[str]= None
+    industry: Optional[str]= None
+    business_description: Optional[str]= None
+    local_description: Optional[str]= None
+    short_description: Optional[str]= None
+    group: Optional[str]= None
+    mic: Optional[str]= None
+    sector: Optional[str]= None
+    web_site_url: Optional[str]= None
+    location: Optional[str]= None
+    fundamental_currency_code: Optional[str]= None
+    rt_update_time: Optional[str]= None
+    exchange_listed: Optional[str]= None
+    exchange_ticker: Optional[str]= None
+    exchange_listed_symbol: Optional[str]= None
+    currency_id: Optional[str]= None
+    ceo: Optional[str] = None
+
 
 additional_info_schema = Schema(
     name_mapping = {underscore(k):k for k in ['exchange-traded','local-description','symbol-proname','rt-update-time','exchange-ticker','exchange-listed','exchange-listed-symbol','short-description','currency-id']}
