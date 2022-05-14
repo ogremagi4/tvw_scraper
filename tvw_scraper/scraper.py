@@ -4,6 +4,7 @@ import regex
 import string
 import random
 import asyncio
+from tenacity import AsyncRetrying, retry, wait_fixed, stop_after_attempt, retry_if_exception_type, stop, wait
 from .schemas import *
 
 json_rgx = regex.compile(r'''
@@ -18,6 +19,9 @@ json_rgx = regex.compile(r'''
 )
 (?&json)
 ''', regex.VERBOSE | regex.MULTILINE)
+
+
+
 
 class TradingviewBase:
     websocket_url = 'wss://data.tradingview.com/socket.io/websocket'
@@ -119,19 +123,20 @@ class TradingviewWsScraper(TradingviewBase):
                     self.messages.resolve_symbol(chart_session_string, tradingview_symbol),
                     self.messages.create_series(chart_session_string,
                      tradingview_timeframe)]
-        
-        async with websockets.connect(self.websocket_url, extra_headers=self.headers) as connection:#TODO make a generic iterator
-            for message in messages:#TODO wrap it somehow to a separate method sending and receiving messages
-                await connection.send(message)
-            while True:
-                response = await connection.recv()
-                for item in self.message_handler(response):
-                    try:
-                        timescale_update = factory.load(item, TimescaleUpdateMessage)
-                        return timescale_update.symbol_data_series.ohlcv
-                    except (TypeError, ValueError):
-                        await asyncio.sleep(0)
-                        continue#XXX play with exceptions a bit
+        async for attempt in AsyncRetrying(stop = stop_after_attempt(10), wait = wait_fixed(3), retry=retry_if_exception_type(websockets.InvalidStatusCode)):
+            with attempt:
+                async with self.websocket_connect(self.websocket_url, extra_headers=self.headers) as connection:#TODO make a generic iterator
+                    for message in messages:
+                        await connection.send(message)
+                    while True:
+                        response = await connection.recv()
+                        for item in self.message_handler(response):
+                            try:
+                                timescale_update = factory.load(item, TimescaleUpdateMessage)
+                                return timescale_update.symbol_data_series.ohlcv
+                            except (TypeError, ValueError):
+                                await asyncio.sleep(0)
+                                continue#XXX play with exceptions a bit
     
     async def get_symbol(self, tradingview_symbol:str):#TODO add bonds support
         """
@@ -144,19 +149,22 @@ class TradingviewWsScraper(TradingviewBase):
                     self.messages.quote_create_session(quote_session_string),
                     self.messages.quote_add_symbols(quote_session_string, tradingview_symbol),
                     self.messages.quote_fast_symbols(quote_session_string, tradingview_symbol)]
-        
-        async with websockets.connect(self.websocket_url, extra_headers=self.headers) as connection: #TODO make a generic iterator
-            for message in messages:#
-                await connection.send(message)
-            while True:
-                response = await connection.recv()
-                for item in self.message_handler(response):
-                    try:
-                        while not 'main_data' in locals():
-                            main_data = factory.load(item, MainData)
-                        additional_data = factory.load(item, AdditionalData)
-                        return CombinedSymbolInfo(main_data.main_info, additional_data.additional_info)
-                    except (TypeError, ValueError):
-                        await asyncio.sleep(0)
-                        continue#XXX play with exceptions a bit
-        
+
+        async for attempt in AsyncRetrying(stop = stop_after_attempt(10), wait = wait_fixed(1), retry=retry_if_exception_type(websockets.InvalidStatusCode)):
+            with attempt:
+                async with websockets.connect(self.websocket_url, extra_headers=self.headers) as connection: #TODO make a generic iterator
+                    for message in messages:#
+                        await connection.send(message)
+                    while True:
+                        response = await connection.recv()
+                        for item in self.message_handler(response):
+                            try:
+                                if not 'main_data' in locals():
+                                    main_data = factory.load(item, MainData)
+                                else:
+                                    additional_data = factory.load(item, AdditionalData)
+                                    return CombinedSymbolInfo(main_data.main_info, additional_data.additional_info)
+                            except (TypeError, ValueError) as e:
+                                print(item, e)
+                                await asyncio.sleep(0)
+                                continue#XXX play with exceptions a bit

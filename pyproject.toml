@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tvw_scraper"
-version = "0.0.14"
+version = "0.0.16"
 description = "Scraping tradingview.com"
 authors = ["fip <ogremagi9@gmail.com>"]
 keywords=['python', 'scraping', 'market data', 'tradingview']
